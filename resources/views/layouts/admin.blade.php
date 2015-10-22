@@ -22,8 +22,8 @@
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#">Dashboard</a></li>
-                        <li><a href="#">Messages <span class="badge text-danger">5</span></a></li>
+                        <li><a href="#" onclick="window.location.reload()">Refresh</a></li>
+                        <li><a href="#" data-toggle="modal" data-target="#messages-list-modal">Messages <span class="badge ">{{ count($adminUser->receivedMessages->where('read', 0)) }}</span></a></li>
                         <li><a href="/help">Help</a></li>
                     </ul>
                 </div>

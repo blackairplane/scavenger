@@ -35,4 +35,21 @@ class MessageController extends ApiController
 
         return $this->response();
     }
+
+    public function createAdmin(Request $request)
+    {
+        $this->validate($request, [
+           'recipient' => 'required',
+           'content' => 'required',
+        ]);
+
+        $message = new Message;
+        $message->sender_id = 1;
+        $message->recipient_id = $request->input('recipient');
+        $message->content = $request->input('content');
+        $message->read = 0;
+        $message->save();
+
+        return $this->response();
+    }
 }

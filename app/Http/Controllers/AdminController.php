@@ -18,6 +18,8 @@ class AdminController extends Controller
 
     public function dashboard(Request $request) {
         $this->data['teams'] = \App\Team::with('points')->get();
+        $this->data['roles'] = \App\Role::get();
+        $this->data['adminUser'] = \App\User::find(1);
         $this->data['users'] = \App\User::where('id', '>', 1)->with('points')->get()->sortByDesc('amount');
         return View::make('admin.dashboard', $this->data);
     }

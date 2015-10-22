@@ -19,7 +19,7 @@ class TeamController extends Controller
     public function dashboard(Request $request) {
         $this->data['user'] = $request->user();
         $this->data['teams'] = Team::with('points')->get();
-        $this->data['players'] = User::where('id', '>', 1)->with(['points','team'])->get();
+        $this->data['players'] = User::with(['points','team'])->get();
         $this->data['challenges'] = \App\Challenge::all();
         return View::make('team.dashboard', $this->data);
     }

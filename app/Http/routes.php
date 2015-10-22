@@ -33,7 +33,11 @@ Route::group(['prefix' => 'api/v1/'], function() {
     Route::post('users/{id}', 'Api\v1\UserController@update')->where('id', '[0-9]+');
     Route::get('users/{id}', 'Api\v1\UserController@show')->where('id', '[0-9]+');
 
+    // Point endpoints
+    Route::post('points', 'Api\v1\UserController@addPoints');
+
     // Message endpoints
     Route::post('messages/read/{id}', 'Api\v1\MessageController@markAsRead')->where('id', '[0-9]+');
     Route::post('messages', 'Api\v1\MessageController@create');
+    Route::post('messages/admin', 'Api\v1\MessageController@createAdmin');
 });

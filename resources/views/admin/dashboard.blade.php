@@ -12,6 +12,13 @@
 
     <div class="row menu-row">
         <div class="col-lg-12">
+            <h1>Point functions</h1>
+            <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#add-points-modal">Add points</a>
+        </div>
+    </div>
+
+    <div class="row menu-row">
+        <div class="col-lg-12">
             <h1>Scavenger hunt </h1>
             <a href="#" class="btn btn-info" data-toggle="modal" data-target="#user-list-modal">Show questions</a>
             <a href="#" class="btn btn-info" data-toggle="modal" data-target="#user-create-modal">Add question</a>
@@ -62,7 +69,6 @@
                     <td>{{ $user->points->sum('amount')}}</td>
                     <td>
                         <a href="#" data-id="{{$user->id}}" class="btn btn-sm user-edit-btn">EDIT PLAYER</a>
-                        {{--<a href="#" class="team-delete-btn" data-id="{{ $team->id }}"><i class="glyphicon glyphicon-trash"></i></a>--}}
                     </td>
                 </tr>
                 @endforeach
@@ -156,6 +162,16 @@
             </div>
 
             <div class="form-group">
+                <label class="control-label" for="role">Role</label>
+                <select name="team" class="form-control" id="user-create-role">
+                        <option>Select a role</option>
+                    @foreach ($roles as $role)
+                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label class="control-label" for="name">Team</label>
                 <select name="team" class="form-control" id="user-create-team">
                         <option>Select a team</option>
@@ -163,6 +179,11 @@
                         <option value="{{ $team->id }}">{{ $team->name }}</option>
                     @endforeach
                 </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="points">Starting points</label>
+                <input type="number" name="points" id="user-create-points" class="form-control"/>
             </div>
 
         </form>
@@ -195,7 +216,17 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label" for="name">Team</label>
+                <label class="control-label" for="role">Role</label>
+                <select name="team" class="form-control" id="user-edit-role">
+                        <option>Select a role</option>
+                    @foreach ($roles as $role)
+                        <option id="user-edit-role-{{$role->id}}" value="{{ $role->id }}">{{ $role->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="team">Team</label>
                 <select name="team" class="form-control" id="user-edit-team">
                         <option>Select a team</option>
                     @foreach ($teams as $team)
@@ -203,6 +234,7 @@
                     @endforeach
                 </select>
             </div>
+
 
             <input type="hidden" name="id" id="user-edit-id" />
 
@@ -216,6 +248,149 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+
+<div class="modal fade" id="add-points-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add points to player</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form">
+            <div class="form-group">
+                <label class="control-label" for="user">Player</label>
+                <select name="user" id="add-points-user" class="form-control">
+                    <option>Select player</option>
+                    @foreach ($users as $user):
+                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="amount">Number of points <small>can be positive or negative</small></label>
+                <input type="number" class="form-control" name="amount" id="add-points-amount" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="note">Note</label>
+                <input type="text" class="form-control" name="note" id="add-points-note" />
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="points-add-submit">Save changes</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="messages-list-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Inbox module</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <h1>Received messages</h1>
+            @if (count($adminUser->receivedMessages) > 0)
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    @foreach ($adminUser->receivedMessages->sortByDesc('created_at')->take(20) as $key => $message)
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="heading-{{$key}}">
+                              <h4 class="panel-title">
+                                <a role="button" class="message-read-btn" data-id="{{ $message->id }}" data-toggle="collapse" data-parent="#accordion" href="#collapse-{{$key}}" aria-expanded="true" aria-controls="collapse-{{$key}}">
+                                  <h1>Message from {{ $message->sender->name }} - {{$message->created_at}}</h1>
+                                </a>
+                              </h4>
+                            </div>
+                            <div id="collapse-{{$key}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-{{$key}}">
+                              <div class="panel-body">
+                               {{ $message->content }}
+                              </div>
+                            </div>
+                          </div>
+                    @endforeach
+                </div>
+            @else
+                <h5 class="text-info">No messages received.</h5>
+            @endif
+        </div>
+
+        <div class="row">
+            <h1>Send a message</h1>
+            <form class="form" id="create-message-form">
+                <div class="form-group">
+                    <label class="control-label" for="recipient">Recipient</label>
+                    <select name="recipient" id="create-message-recipient" class="form-control" required>
+                        <option>Select someone to receive message</option>
+                        @foreach ($users->sortBy('name') as $user)
+                            @if ($adminUser->id != $user->id)
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="content">Message</label>
+                    <textarea class="form-control" id="create-message-content" required></textarea>
+                </div>
+
+                <div class="form-group text-center">
+                    <a href="#" class="btn btn-info" id="create-message-submit">Send message!</a>
+                </div>
+            </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="challenge-add-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add challenge</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form">
+            <div class="form-group">
+                <label class="control-label" for="prompt">Question prompt</label>
+                <input type="text" class="form-control" name="prompt" id="challenge-add-prompt" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="answer">Answer</label>
+                <input type="text" class="form-control" name="answer" id="challenge-add-answer" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="value">Points value</label>
+                <input type="number" class="form-control" name="value" id="challenge-add-value" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="active">Active time <small>leave blank to make active now</small></label>
+                <input type="datetime-local" class="form-control" name="active" id="challenge-add-active" />
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="points-add-submit">Save changes</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 @endsection
 
 @section('scripts')
@@ -290,7 +465,9 @@ $(document).ready(function() {
                 _token: token,
                 name : $("#user-create-name").val(),
                 password : $("#user-create-password").val(),
-                team : $("#user-create-team").val()
+                role : $("#user-create-role").val(),
+                team : $("#user-create-team").val(),
+                points : $("#user-create-points").val()
             },
             success : function(d) {
                 $("#user-create-modal input").val('');
@@ -310,6 +487,7 @@ $(document).ready(function() {
             url : apiURL + 'users/' + userId,
             success : function(d) {
                 $("#user-edit-name").val(d['data']['name']);
+                $('#user-edit-role-' + d['data']['role_id']).attr('selected', 'selected');
                 $('#user-edit-team-' + d['data']['team_id']).attr('selected', 'selected');
                 $('#user-edit-id').val(d['data']['id']);
                 $("#user-edit-modal").modal('show');
@@ -336,6 +514,56 @@ $(document).ready(function() {
             },
             error : function() {
                 alertify.error('User lookup failed!');
+            }
+        });
+    });
+
+    // Point functions
+    $("#points-add-submit").click(function() {
+        $.ajax({
+            type : 'post',
+            url : apiURL + 'points',
+            data : {
+                _token : token,
+                user_id : $("#add-points-user").val(),
+                amount : $("#add-points-amount").val(),
+                note : $("#add-points-note").val()
+            },
+            success : function(d) {
+                window.location.reload();
+            },
+            error : function() {
+                alertify.error('Point addition failed!');
+            }
+        });
+    });
+
+    $("#create-message-submit").click(function(){
+        $.ajax({
+            type : 'post',
+            url : apiURL + 'messages/admin',
+            data : {
+                _token : token,
+                recipient : $("#create-message-recipient").val(),
+                content : $("#create-message-content").val()
+            },
+            success : function(d) {
+                $("#messages-list-modal select").val('');
+                $("#messages-list-modal textarea").val('');
+                $("#messages-list-modal").modal('hide');
+                alertify.success('Message sent!');
+            }
+        });
+    });
+
+    // Mark message as read
+    $(".message-read-btn").click(function() {
+        var messageId = $(this).data('id');
+        $.ajax({
+            type : 'post',
+            url : apiURL + 'messages/read/' + messageId,
+            data : {
+                _token : token
             }
         });
     });
