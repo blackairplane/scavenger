@@ -21,7 +21,12 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+        $user = new \App\User;
+        $user->name = 'The Remnant';
+        $user->save();
     }
+
 
     /**
      * Reverse the migrations.
