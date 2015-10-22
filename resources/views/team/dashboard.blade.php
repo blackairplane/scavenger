@@ -5,15 +5,40 @@
 <div class="row menu-row">
     <div class="col-lg-7">
         <div class="row menu-row" style="padding-right:25px;">
-            <h1>Welcome <em>{{ $user->name }}</em></h1>
+            <h1>Welcome <em class="text-info">{{ $user->name }}</em></h1>
             <p>This is the player dashboard. It will be your gateway to your digital testing and communication. You can start by clicking HELP on the main navigation module.</p>
         </div>
 
+        <div class="row menu-row">
+            <h1>Your role: [<span class="text-info">{{ $user->role->name }}</span>]</h1>
+            <p>{{ $user->role->description }}</p>
+            <h3>Your tasks:</h3>
+            <ul>
+            @foreach (explode('|', $user->role->tasks) as $task)
+                <li>{{ $task }}</li>
+            @endforeach
+            </ul>
+        </div>
+
+        <div class="row menu-row">
+            <h1>Your role token:</h1>
+            <p>A recruit can redeem their role token <strong>once</strong> for a reward and points.</p>
+            @if ( $user->points->where('note', 'role token')->first() )
+                <p>You've already redeemed your role token for
+                <span class="text-info">{{ $user->points->where('note', 'role token')->first()->amount }}</span> points.</p>
+            @else
+                <p>Redeem your role token for [<span class="text-info">{{ $user->role->reward }}</span>] and <span class="text-info">{{ tokenRedeemValue() }}</span> points;</p>
+                <a href="#" class="btn btn-lg btn-success">Redeem my token</a>
+            @endif
+        </div>
+
+        @if ($user->role->name == 'Technologist')
         <div class="row menu-row">
             <h1>Digital quest</h1>
             <p>Current number of active challenges: {{ count($challenges) }}</p>
             <a href="#" class="btn btn-default" @if (count($challenges) == 0) disabled="disabled" @endif>Begin Quest</a>
         </div>
+        @endif
     </div>
 
     <div class="col-lg-5">
@@ -55,9 +80,11 @@
                                 <td>{{ $player->name }}</td>
                                 <td>{{ $player->points->sum('amount')}}</td>
                                 <td>
+                                    @if ($player->id != $user->id)
                                     <a href="#" class="send-points-btn">
                                         <i class="glyphicon glyphicon-plus"></i>
                                     </a>
+                                    @endif
                                 </td>
                             </tr>
                         @endif

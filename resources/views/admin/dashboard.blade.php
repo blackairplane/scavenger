@@ -4,14 +4,6 @@
 <div class="col-lg-7">
     <div class="row menu-row">
         <div class="col-lg-12">
-            <h1>Message functions</h1>
-            <a href="#" class="btn btn-default" data-toggle="modal" data-target="#user-list-modal">Show messages</a>
-            <a href="#" class="btn btn-default" data-toggle="modal" data-target="#user-create-modal">New message</a>
-        </div>
-    </div>
-
-    <div class="row menu-row">
-        <div class="col-lg-12">
             <h1>Point functions</h1>
             <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#add-points-modal">Add points</a>
         </div>

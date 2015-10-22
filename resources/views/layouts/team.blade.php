@@ -51,11 +51,26 @@
                     <div class="row">
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="#training" data-toggle="tab" aria-expanded="true">Training</a></li>
+                            <li class=""><a href="#tips" data-toggle="tab" aria-expanded="false">Tips</a></li>
                             <li class=""><a href="#roles" data-toggle="tab" aria-expanded="false">Roles</a></li>
                         </ul>
                         <div id="myTabContent" class="tab-content">
                             <div class="tab-pane fade active in" id="training">
-                                <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi, qui irure terry richardson ex squid. Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui.</p>
+                                <p>The Remnant is an organization that is working to keep discipleship alive in a world that is increasingly post-Christian. In the year 1984, a few Remnant agents were sent 300 years into the future to ensure their message would survive.
+                                   The year 2284 was exactly as expected: flying cars, laser guns, robots and more. The situation was dire and new discipleship efforts were immediately put into place.
+                                   Our story centers around the seventeenth “Remnant Discipleship Station” (RDS), codenamed “Titus”.
+                                   Twenty or so recruits will placed in training to be tested and proven.</p>
+                            </div>
+                            <div class="tab-pane fade" id="tips">
+                                <ul>
+                                    <li>You may find that waiting pays off.</li>
+                                    <li>Use your points to pay other recruits for goods or services.</li>
+                                    <li>Have something someone else wants? Feel free to trade.</li>
+                                    <li>No matter what, don't complain.</li>
+                                    <li>Always do your best.</li>
+                                    <li>You can message the Remnant for help if needed.</li>
+                                    <li>The Remnant can reward or take away points as they see fit.</li>
+                                </ul>
                             </div>
 
                             <div class="tab-pane fade " id="roles">

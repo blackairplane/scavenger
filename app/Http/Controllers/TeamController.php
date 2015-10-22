@@ -24,9 +24,10 @@ class TeamController extends Controller
         return View::make('team.dashboard', $this->data);
     }
 
-    public function showLogin(Request $request) {
-        return View::make('auth.login', $this->data);
-    }
+//    public function showLogin(Request $request) {
+//        $this->data['roles'] = \App\Role::get();
+//        return View::make('auth.login', $this->data);
+//    }
 
     public function login(Request $request) {
         if ($request->user()):
