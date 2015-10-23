@@ -47,4 +47,22 @@ class TeamController extends ApiController
         $this->output['data'] = $team;
         return $this->response();
     }
+
+    public function addPoints(Request $request, $id)
+    {
+        $this->validate($request, [
+            'amount' => 'required|numeric',
+        ]);
+
+        $team = Team::find($id);
+        foreach ($team->users as $user):
+            $points = new \App\Point;
+            $points->user_id = $user->id;
+            $points->amount = $request->input('amount');
+            $points->note = $request->input('note');
+            $points->save();
+        endforeach;
+
+        return $this->response();
+    }
 }

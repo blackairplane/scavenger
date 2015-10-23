@@ -39,6 +39,75 @@
             @yield('content')
 
             @yield('modals')
+            @if (isset($user))
+            <div class="modal fade" id="messages-list-modal">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Inbox module</h4>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row">
+                        <h1>Received messages</h1>
+                        @if (count($user->receivedMessages) > 0)
+                            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                @foreach ($user->receivedMessages->sortByDesc('created_at')->take(10) as $key => $message)
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" role="tab" id="heading-{{$key}}">
+                                          <h4 class="panel-title">
+                                            <a role="button" class="message-read-btn" data-id="{{ $message->id }}" data-toggle="collapse" data-parent="#accordion" href="#collapse-{{$key}}" aria-expanded="true" aria-controls="collapse-{{$key}}">
+                                              <h1>Message from {{ $message->sender->name }} - {{$message->created_at}}</h1>
+                                            </a>
+                                          </h4>
+                                        </div>
+                                        <div id="collapse-{{$key}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-{{$key}}">
+                                          <div class="panel-body">
+                                           {{ $message->content }}
+                                          </div>
+                                        </div>
+                                      </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <h5 class="text-info">No messages received.</h5>
+                        @endif
+                    </div>
+
+                    <div class="row">
+                        <h1>Send a message</h1>
+                        <form class="form" id="create-message-form">
+                            <div class="form-group">
+                                <label class="control-label" for="recipient">Recipient</label>
+                                <select name="recipient" id="create-message-recipient" class="form-control" required>
+                                    <option>Select someone to receive message</option>
+                                    @foreach ($players->sortBy('name') as $player)
+                                        @if ($user->id != $player->id)
+                                            <option value="{{ $player->id }}">{{ $player->name }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="content">Message</label>
+                                <textarea class="form-control" id="create-message-content" required></textarea>
+                            </div>
+
+                            <div class="form-group text-center">
+                                <a href="#" class="btn btn-info" id="create-message-submit">Send message!</a>
+                            </div>
+                        </form>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                  </div>
+                </div><!-- /.modal-content -->
+              </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+            @endif
+
             <div class="modal fade" id="user-help-modal">
               <div class="modal-dialog">
                 <div class="modal-content">
@@ -128,6 +197,44 @@
          <script src="/assets/js/bootstrap.min.js"></script>
          <script src="/assets/js/alertify.js"></script>
          <script src="/assets/js/datatables.min.js"></script>
+
+         <script>
+         var token = $("input[name='_token']").val(),
+                                  apiURL = "/api/v1/";
+         $(document).ready(function() {
+
+
+             // Mark message as read
+             $(".message-read-btn").click(function() {
+                 var messageId = $(this).data('id');
+                 $.ajax({
+                     type : 'post',
+                     url : apiURL + 'messages/read/' + messageId,
+                     data : {
+                         _token : token
+                     }
+                 });
+             });
+
+             $("#create-message-submit").click(function(){
+                 $.ajax({
+                     type : 'post',
+                     url : apiURL + 'messages',
+                     data : {
+                         _token : token,
+                         recipient : $("#create-message-recipient").val(),
+                         content : $("#create-message-content").val()
+                     },
+                     success : function(d) {
+                         $("#messages-list-modal select").val('');
+                         $("#messages-list-modal textarea").val('');
+                         $("#messages-list-modal").modal('hide');
+                         alertify.success('Message sent!');
+                     }
+                 });
+             });
+         });
+         </script>
         @yield('scripts')
     </body>
 </html>

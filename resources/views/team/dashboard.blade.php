@@ -28,7 +28,8 @@
                 <span class="text-info">{{ $user->points->where('note', 'role token')->first()->amount }}</span> points.</p>
             @else
                 <p>Redeem your role token for [<span class="text-info">{{ $user->role->reward }}</span>] and <span class="text-info">{{ tokenRedeemValue() }}</span> points;</p>
-                <a href="#" class="btn btn-lg btn-success">Redeem my token</a>
+                <input type="hidden" id="redeem-token-amount" value="{{ tokenRedeemValue() }}"/>
+                <a href="#" class="btn btn-lg btn-success" id="redeem-token-btn">Redeem my token</a>
             @endif
         </div>
 
@@ -36,7 +37,7 @@
         <div class="row menu-row">
             <h1>Digital quest</h1>
             <p>Current number of active challenges: {{ count($challenges) }}</p>
-            <a href="#" class="btn btn-default" @if (count($challenges) == 0) disabled="disabled" @endif>Begin Quest</a>
+            <a href="quest" class="btn btn-default" @if (count($challenges) == 0) disabled="disabled" @endif>View Quest</a>
         </div>
         @endif
     </div>
@@ -81,7 +82,7 @@
                                 <td>{{ $player->points->sum('amount')}}</td>
                                 <td>
                                     @if ($player->id != $user->id)
-                                    <a href="#" class="send-points-btn">
+                                    <a href="#" class="send-points-btn" data-id="{{$player->id}}">
                                         <i class="glyphicon glyphicon-plus"></i>
                                     </a>
                                     @endif
@@ -102,73 +103,6 @@
 @endsection
 
 @section('modals')
-<div class="modal fade" id="messages-list-modal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Inbox module</h4>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-            <h1>Received messages</h1>
-            @if (count($user->receivedMessages) > 0)
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    @foreach ($user->receivedMessages->sortByDesc('created_at')->take(10) as $key => $message)
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="heading-{{$key}}">
-                              <h4 class="panel-title">
-                                <a role="button" class="message-read-btn" data-id="{{ $message->id }}" data-toggle="collapse" data-parent="#accordion" href="#collapse-{{$key}}" aria-expanded="true" aria-controls="collapse-{{$key}}">
-                                  <h1>Message from {{ $message->sender->name }} - {{$message->created_at}}</h1>
-                                </a>
-                              </h4>
-                            </div>
-                            <div id="collapse-{{$key}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-{{$key}}">
-                              <div class="panel-body">
-                               {{ $message->content }}
-                              </div>
-                            </div>
-                          </div>
-                    @endforeach
-                </div>
-            @else
-                <h5 class="text-info">No messages received.</h5>
-            @endif
-        </div>
-
-        <div class="row">
-            <h1>Send a message</h1>
-            <form class="form" id="create-message-form">
-                <div class="form-group">
-                    <label class="control-label" for="recipient">Recipient</label>
-                    <select name="recipient" id="create-message-recipient" class="form-control" required>
-                        <option>Select someone to receive message</option>
-                        @foreach ($players->sortBy('name') as $player)
-                            @if ($user->id != $player->id)
-                                <option value="{{ $player->id }}">{{ $player->name }}</option>
-                            @endif
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="control-label" for="content">Message</label>
-                    <textarea class="form-control" id="create-message-content" required></textarea>
-                </div>
-
-                <div class="form-group text-center">
-                    <a href="#" class="btn btn-info" id="create-message-submit">Send message!</a>
-                </div>
-            </form>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
 <div class="modal fade" id="send-points-modal">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -180,7 +114,9 @@
         <div class="row">
             @if ( $user->points->sum('amount') > 0)
                 <h1>You have {{ $user->points->sum('amount') }} points.</h1>
-                <h1>How many do you want to send?</h1>
+                <h1>How many do you want to send to <span class="text-info" id="send-points-recipient-name"></span>?</h1>
+                <input class="form-control" id="send-points-amount" type="number" value="0" max="{{ $user->points->sum('amount') }}"/>
+                <input class="form-control" id="send-points-recipient-id" type="hidden" />
             @else
                 <h1>Sorry, you have {{ $user->points->sum('amount') }} points, so you cannot send any.</h1>
             @endif
@@ -188,6 +124,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        @if ( $user->points->sum('amount') > 0)
+            <button type="button" class="btn btn-primary" id="send-points-submit">Send</button>
+        @endif
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -197,43 +136,63 @@
 @section('scripts')
 <script>
 $(document).ready(function() {
-    var token = $("input[name='_token']").val(),
-                apiURL = "/api/v1/";
-
-    // Mark message as read
-    $(".message-read-btn").click(function() {
-        var messageId = $(this).data('id');
-        $.ajax({
-            type : 'post',
-            url : apiURL + 'messages/read/' + messageId,
-            data : {
-                _token : token
-            }
-        });
-    });
-
-    $("#create-message-submit").click(function(){
-        $.ajax({
-            type : 'post',
-            url : apiURL + 'messages',
-            data : {
-                _token : token,
-                recipient : $("#create-message-recipient").val(),
-                content : $("#create-message-content").val()
-            },
-            success : function(d) {
-                $("#messages-list-modal select").val('');
-                $("#messages-list-modal textarea").val('');
-                $("#messages-list-modal").modal('hide');
-                alertify.success('Message sent!');
-            }
-        });
-    });
-
     // Points functions
     $(".send-points-btn").click(function(){
-        $("#send-points-modal").modal('show');
+        var playerId = $(this).data('id');
+        $.ajax({
+            type : 'get',
+            url : apiURL + 'users/' + playerId,
+            success : function(d) {
+                $("#send-points-recipient-name").html(d['data']['name']);
+                $("#send-points-recipient-id").val(d['data']['id']);
+                $("#send-points-modal").modal('show');
+            }
+        });
     });
+
+    $("#send-points-submit").click(function(){
+        $.ajax({
+            type : 'post',
+            url : apiURL + 'points/send/' + $("#send-points-recipient-id").val(),
+            data : {
+               _token : token,
+               amount : $("#send-points-amount").val()
+            },
+            success : function(d) {
+                window.location.reload();
+            }
+        });
+    });
+
+    $("#redeem-token-btn").click(function(){
+        $.ajax({
+            type : 'post',
+            url : apiURL + 'points',
+            data : {
+                _token : token,
+                amount : $("#redeem-token-amount").val(),
+                note : 'role token',
+                user_id : {{ $user->id }}
+            },
+            success : function() {
+                window.location.reload();
+            }
+        });
+    })
 });
+
+$("#user-standings-table").dataTable({
+        "bFilter" : false,
+        "bPaginate" : false,
+        "bInfo" : false,
+        "order" : [[1,'desc']]
+    });
+
+    $("#team-standings-table").dataTable({
+        "bFilter" : false,
+        "bPaginate" : false,
+        "bInfo" : false,
+        "order" : [[1,'desc']]
+    });
 </script>
 @endsection

@@ -7,6 +7,6 @@
  */
 
 function tokenRedeemValue() {
-    $gameStart = strtotime('2015-10-22 18:30:00');
+    $gameStart = strtotime('2015-10-23 17:30:00');
     return round((time()-$gameStart)/1000);
 }

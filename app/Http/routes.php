@@ -13,6 +13,7 @@
 
 Route::get('/', ['middleware' => 'auth', 'uses' => 'TeamController@dashboard']);
 Route::get('dashboard', ['middleware' => 'auth', 'uses' => 'TeamController@dashboard']);
+Route::get('quest', ['middleware' => 'auth', 'uses' => 'TeamController@quest']);
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
 Route::get('auth/logout', 'Auth\AuthController@getLogout');
@@ -35,9 +36,15 @@ Route::group(['prefix' => 'api/v1/'], function() {
 
     // Point endpoints
     Route::post('points', 'Api\v1\UserController@addPoints');
+    Route::post('points/team/{id}', 'Api\v1\TeamController@addPoints');
+    Route::post('points/send/{id}', 'Api\v1\UserController@sendPoints');
 
     // Message endpoints
     Route::post('messages/read/{id}', 'Api\v1\MessageController@markAsRead')->where('id', '[0-9]+');
     Route::post('messages', 'Api\v1\MessageController@create');
     Route::post('messages/admin', 'Api\v1\MessageController@createAdmin');
+
+    // Challenge endpoints
+    Route::post('challenges', 'Api\v1\ChallengeController@create');
+    Route::post('challenges/guess/{id}', 'Api\v1\ChallengeController@guess');
 });

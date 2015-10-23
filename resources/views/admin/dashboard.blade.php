@@ -12,8 +12,8 @@
     <div class="row menu-row">
         <div class="col-lg-12">
             <h1>Scavenger hunt </h1>
-            <a href="#" class="btn btn-info" data-toggle="modal" data-target="#user-list-modal">Show questions</a>
-            <a href="#" class="btn btn-info" data-toggle="modal" data-target="#user-create-modal">Add question</a>
+            {{--<a href="#" class="btn btn-info" data-toggle="modal" data-target="#challenge-add-modal">Show questions</a>--}}
+            <a href="#" class="btn btn-info" data-toggle="modal" data-target="#challenge-add-modal">Add question</a>
         </div>
     </div>
 </div>
@@ -378,7 +378,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="points-add-submit">Save changes</button>
+        <button type="button" class="btn btn-primary" id="challenge-add-submit">Save changes</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -404,6 +404,7 @@ $(document).ready(function() {
             success : function(d) {
                 $("#team-create-modal input").val('');
                 $("#team-create-modal").modal('hide');
+                window.location.reload();
             },
             error : function() {
                 alertify.error('Team creation failed!');
@@ -499,13 +500,13 @@ $(document).ready(function() {
                 name : $("#user-edit-name").val(),
                 password : $("#user-edit-password").val(),
                 team : $("#user-edit-team").val(),
-                id : $("#user-edit-id").val()
+                role : $("#user-edit-role").val()
             },
             success : function(d) {
                 window.location.reload();
             },
             error : function() {
-                alertify.error('User lookup failed!');
+                alertify.error('User update failed!');
             }
         });
     });
@@ -572,6 +573,24 @@ $(document).ready(function() {
         "bPaginate" : false,
         "bInfo" : false,
         "order" : [[1,'desc']]
+    });
+
+    // Challenge functions
+    $("#challenge-add-submit").click(function() {
+        $.ajax({
+            type : 'post',
+            url : apiURL + 'challenges',
+            data : {
+                _token : token,
+                prompt : $("#challenge-add-prompt").val(),
+                answer : $("#challenge-add-answer").val(),
+                value : $("#challenge-add-value").val(),
+                active_time : $("#challenge-add-active").val()
+            },
+            success : function() {
+                window.location.reload();
+            }
+        });
     });
 });
 </script>

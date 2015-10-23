@@ -79,4 +79,29 @@ class UserController extends ApiController
 
         return $this->response();
     }
+
+    public function sendPoints(Request $request, $id)
+    {
+        $this->validate($request, [
+            'amount' => 'required|numeric',
+        ]);
+
+        $recipient = User::find($id);
+
+        if ( $request->user()->points->sum('amount') >= $request->input('amount')):
+            $points = new \App\Point;
+            $points->user_id = $request->user()->id;
+            $points->amount = $request->input('amount') * -1;
+            $points->note = "Transfer to {$recipient->name}[{$recipient->id}].";
+            $points->save();
+
+            $senderPoints = new \App\Point;
+            $senderPoints->user_id = $recipient->id;
+            $senderPoints->amount = $request->input('amount');
+            $senderPoints->note = "Transfer from {$request->user()->name}[{$request->user()->id}].";
+            $senderPoints->save();
+        endif;
+
+        return $this->response();
+    }
 }
