@@ -11,7 +11,7 @@
             <label class="control-label">{{$challenge->prompt}} </label>
             @if ( ! $user->points->where('note', 'challenge-' . $challenge->id)->first())
             <input type="text" class="form-control" name="answer" id="challenge-answer-{{$challenge->id}}" />
-            <input type="hidden" value="{{ $challenge->value }}" class="form-control" id="challenge-value" />
+            <input type="hidden" value="{{ $challenge->value }}" class="form-control" id="challenge-value-{{ $challenge->id }}" />
             <a href="#" data-id="{{ $challenge->id }}" class="btn btn-info challenge-submit-btn" name="answer">Submit</a>
             <span id="challenge-error-{{ $challenge->id }}" class="text-danger"></span>
             @else
@@ -44,7 +44,7 @@ $(document).ready(function(){
                         data : {
                             _token : token,
                             note : 'challenge-' + challengeId,
-                            amount : $("#challenge-value").val(),
+                            amount : $("#challenge-value-" + challengeId).val(),
                             challenge : true
                         },
                         success : function() {
