@@ -44,7 +44,8 @@ $(document).ready(function(){
                         data : {
                             _token : token,
                             note : 'challenge-' + challengeId,
-                            amount : $("#challenge-value").val()
+                            amount : $("#challenge-value").val(),
+                            challenge : true
                         },
                         success : function() {
                             window.location.reload();
