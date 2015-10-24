@@ -56,7 +56,7 @@ class TeamController extends ApiController
 
         $team = Team::find($id);
         foreach ($team->users as $user):
-            if ( ! Point::where(['note' => $request->input('note')])->first() ):
+            if ( ! \App\Point::where(['note' => $request->input('note')])->first() ):
                 $points = new \App\Point;
                 $points->user_id = $user->id;
                 $points->amount = $request->input('amount');
